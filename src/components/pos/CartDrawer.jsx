@@ -87,7 +87,7 @@ function CartDrawer({
                             <span className="total-value">${totalAmount.toFixed(2)}</span>
                         </div>
 
-                        <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={onSubmit}>
+                        <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', background: 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)', fontSize: '1rem', fontWeight: 600 }} onClick={onSubmit}>
                             Confirm Order
                         </button>
                     </div>

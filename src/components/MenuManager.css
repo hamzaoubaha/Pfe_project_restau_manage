@@ -16,10 +16,10 @@
     display: flex;
     gap: 1.5rem;
     align-items: center;
-    background: var(--bg-secondary);
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
     padding: 0.75rem 1rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-sm);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
     flex-wrap: wrap;
     border: 1px solid rgba(0, 0, 0, 0.03);
 }
@@ -93,19 +93,32 @@
 
 .menu-item-card {
     background: var(--bg-secondary);
-    border-radius: 16px;
+    border-radius: var(--border-radius-lg);
     overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(0, 0, 0, 0.03);
     display: flex;
     flex-direction: column;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     height: 100%;
 }
 
+.menu-item-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
 .menu-item-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
 }
 
 .item-image {
@@ -225,9 +238,9 @@
     margin: 2rem auto;
     background: var(--bg-secondary);
     padding: 3rem;
-    border-radius: 24px;
+    border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-lg);
-    border: 1px solid rgba(107, 78, 61, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .add-item-form {
@@ -238,11 +251,15 @@
 .form-title {
     margin-bottom: 2.5rem;
     font-size: 1.75rem;
-    color: var(--primary);
-    border-bottom: 2px solid rgba(107, 78, 61, 0.1);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
     padding-bottom: 1rem;
     text-align: center;
     font-family: var(--font-heading);
+    font-weight: 700;
 }
 
 .form-grid {
@@ -364,14 +381,13 @@
     margin-top: 1rem;
     border-radius: 50px;
     font-weight: 600;
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     color: white;
-    box-shadow: 0 4px 15px rgba(107, 78, 61, 0.3);
-    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
 }
 
 .save-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(107, 78, 61, 0.4);
-    background: var(--primary-hover);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
 }

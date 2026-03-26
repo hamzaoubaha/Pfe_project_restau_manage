@@ -4,8 +4,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -15,14 +15,14 @@
 
 .order-form-container {
     background: var(--bg-secondary);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-lg);
     padding: 2rem;
     max-width: 700px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: var(--shadow-lg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .form-header {
@@ -35,6 +35,11 @@
 .form-header h2 {
     font-size: 1.75rem;
     margin: 0;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
 }
 
 .close-btn {
@@ -126,12 +131,13 @@
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem;
-    background: var(--bg-tertiary);
-    border-radius: var(--border-radius-sm);
+    background: linear-gradient(135deg, var(--primary-light) 0%, #F0EADF 100%);
+    border-radius: var(--border-radius);
     margin-bottom: 2rem;
     font-size: 1.25rem;
     font-weight: 600;
-    border: 2px solid rgba(102, 126, 234, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .total-value {
