@@ -1,4 +1,4 @@
-import { LayoutDashboard, UtensilsCrossed, PlusCircle, Briefcase } from 'lucide-react'
+import { LayoutDashboard, UtensilsCrossed, PlusCircle, Warehouse } from 'lucide-react'
 import './Header.css'
 
 function Header({ onNewOrder, onViewChange, currentView }) {
@@ -25,6 +25,14 @@ function Header({ onNewOrder, onViewChange, currentView }) {
                     >
                         <UtensilsCrossed size={20} />
                         <span>Menu</span>
+                    </button>
+
+                    <button
+                        className={`nav-item ${currentView === 'stock_manager' ? 'active' : ''}`}
+                        onClick={() => onViewChange('stock_manager')}
+                    >
+                        <Warehouse size={20} />
+                        <span>Stock</span>
                     </button>
                 </nav>
 

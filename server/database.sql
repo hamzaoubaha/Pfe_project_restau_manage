@@ -47,3 +47,17 @@ CREATE TABLE IF NOT EXISTS `order_items` (
     `category`  VARCHAR(100),
     CONSTRAINT `fk_order` FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- -------------------------------------------------------
+-- Table: stock_items  (Gestion de Stock / Inventory)
+-- -------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `stock_items` (
+    `id`           INT AUTO_INCREMENT PRIMARY KEY,
+    `name`         VARCHAR(255) NOT NULL,
+    `quantity`     DECIMAL(10,2) NOT NULL DEFAULT 0,
+    `unit`         VARCHAR(50) DEFAULT 'kg',
+    `min_quantity` DECIMAL(10,2) NOT NULL DEFAULT 1,
+    `category`     VARCHAR(100) DEFAULT 'Ingrédients',
+    `updated_at`   TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `created_at`   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

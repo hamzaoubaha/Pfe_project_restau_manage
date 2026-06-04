@@ -3,6 +3,7 @@ const cors = require('cors');
 
 const { getAllOrders, createOrder, updateOrder, deleteOrder } = require('./models/Order');
 const { getAllMenuItems, createMenuItem, updateMenuItem, deleteMenuItem } = require('./models/MenuItem');
+const { getAllStockItems, createStockItem, updateStockItem, deleteStockItem, getLowStockItems } = require('./models/StockItem');
 
 const app = express();
 const PORT = 5001;
@@ -94,6 +95,60 @@ app.delete('/api/menu/:id', async (req, res) => {
     try {
         await deleteMenuItem(req.params.id);
         res.json({ message: 'Menu item deleted' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// -------------------------------------------------------
+// Stock Routes (Gestion de Stock)
+// -------------------------------------------------------
+
+// GET all stock items
+app.get('/api/stock', async (req, res) => {
+    try {
+        const items = await getAllStockItems();
+        res.json(items);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// GET low stock items (alerts)
+app.get('/api/stock/low', async (req, res) => {
+    try {
+        const items = await getLowStockItems();
+        res.json(items);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// CREATE a new stock item
+app.post('/api/stock', async (req, res) => {
+    try {
+        const savedItem = await createStockItem(req.body);
+        res.status(201).json(savedItem);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+// UPDATE a stock item (restock / edit)
+app.put('/api/stock/:id', async (req, res) => {
+    try {
+        const updatedItem = await updateStockItem(req.params.id, req.body);
+        res.json(updatedItem);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+// DELETE a stock item
+app.delete('/api/stock/:id', async (req, res) => {
+    try {
+        await deleteStockItem(req.params.id);
+        res.json({ message: 'Stock item deleted' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

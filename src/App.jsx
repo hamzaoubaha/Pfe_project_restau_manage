@@ -4,6 +4,7 @@ import Header from './components/Header'
 import Dashboard from './components/Dashboard'
 import MenuManager from './components/MenuManager'
 import OrderList from './components/OrderList'
+import StockManager from './components/StockManager'
 // POS Components
 import OrderSetup from './components/pos/OrderSetup'
 import MenuBrowser from './components/pos/MenuBrowser'
@@ -169,6 +170,8 @@ function App() {
     switch (view) {
       case 'menu_manager':
         return <MenuManager />
+      case 'stock_manager':
+        return <StockManager />
       case 'pos_setup':
         return <OrderSetup onNext={startNewOrder} />
       case 'pos_ordering':
