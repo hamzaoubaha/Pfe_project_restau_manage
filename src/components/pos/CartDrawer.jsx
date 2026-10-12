@@ -33,23 +33,23 @@ function CartDrawer({
                             <div key={item.id} className="cart-item-row animate-fade-in">
                                 <div>
                                     <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{item.name}</div>
-                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>${item.price.toFixed(2)}</div>
+                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{item.price.toFixed(0)} DH</div>
                                 </div>
 
                                 <div className="quantity-controls">
                                     <button
                                         className="qty-btn"
-                                        onClick={() => item.quantity > 1 ? onUpdateQuantity(item.id, item.quantity - 1) : onRemoveItem(item.id)}
+                                        onClick={() => item.quantity > 1 ? onUpdateQuantity(item.name, item.quantity - 1) : onRemoveItem(item.name)}
                                     ><Minus size={14} /></button>
                                     <span style={{ minWidth: '20px', textAlign: 'center', fontWeight: 'bold' }}>{item.quantity}</span>
                                     <button
                                         className="qty-btn"
-                                        onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                                        onClick={() => onUpdateQuantity(item.name, item.quantity + 1)}
                                     ><Plus size={14} /></button>
                                 </div>
 
                                 <button
-                                    onClick={() => onRemoveItem(item.id)}
+                                    onClick={() => onRemoveItem(item.name)}
                                     style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
                                     title="Remove"
                                 >
@@ -84,7 +84,7 @@ function CartDrawer({
 
                         <div className="form-total" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', fontSize: '1.5rem', fontFamily: 'var(--font-heading)', color: 'var(--primary)' }}>
                             <span>Total</span>
-                            <span className="total-value">${totalAmount.toFixed(2)}</span>
+                            <span className="total-value">{totalAmount.toFixed(0)} DH</span>
                         </div>
 
                         <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={onSubmit}>

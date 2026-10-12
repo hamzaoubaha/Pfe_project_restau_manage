@@ -156,14 +156,19 @@ function MenuManager() {
                     <div className="menu-grid">
                         {filteredItems.map(item => (
                             <div key={item.id || item._id} className="menu-item-card">
-                                <img src={item.imageUrl} alt={item.name} className="item-image" />
+                                <img 
+                                    src={item.imageUrl || 'https://placehold.co/400x300?text=No+Image'} 
+                                    alt={item.name} 
+                                    className="item-image" 
+                                    onError={e => { e.target.onerror = null; e.target.src = 'https://placehold.co/400x300?text=No+Image' }}
+                                />
                                 <div className="item-content">
                                     <div className="item-header">
                                         <div>
                                             <span className="category-badge">{item.category || 'Main'}</span>
                                             <h3 className="item-title">{item.name}</h3>
                                         </div>
-                                        <div className="item-price">${item.price.toFixed(2)}</div>
+                                        <div className="item-price">{item.price.toFixed(0)} DH</div>
                                     </div>
                                     <p className="item-description">{item.description}</p>
 
@@ -215,7 +220,7 @@ function MenuManager() {
                             </div>
 
                             <div className="form-group">
-                                <label>Price ($)</label>
+                                <label>Price (DH)</label>
                                 <div className="input-with-icon">
                                     <DollarSign size={16} className="input-icon" />
                                     <input

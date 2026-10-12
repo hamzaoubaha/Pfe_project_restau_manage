@@ -1,65 +1,85 @@
 .header {
-    height: 70px;
     background-color: var(--bg-secondary);
     border-bottom: 1px solid #E0E0E0;
-    display: flex;
-    justify-content: center;
-    /* Center the inner content */
     box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    width: 100%;
 }
 
-/* Inner container to match main content width */
+/* Inner container */
 .header-inner {
     width: 100%;
-    max-width: 1200px;
-    padding: 0 2rem;
+    max-width: 1400px;
+    padding: 0 1.5rem;
+    margin: 0 auto;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 1rem;
 }
 
 .logo-container {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.6rem;
     color: var(--primary);
+    flex-shrink: 0;
 }
 
 .logo-image {
-    height: 48px;
-    width: 48px;
+    height: 40px;
+    width: 40px;
     object-fit: cover;
     border-radius: 50%;
     border: 2px solid var(--primary);
     box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
 }
 
 .logo-text {
-    font-size: 1.25rem;
-    /* Smaller, cleaner logo text */
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 700;
     color: var(--text-primary);
     margin: 0;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* Hide logo text on very small screens */
+@media (max-width: 400px) {
+    .logo-text { display: none; }
 }
 
 .nav-menu {
     display: flex;
-    gap: 0.25rem;
+    gap: 0.15rem;
+    flex: 1;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .nav-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
+    gap: 0.4rem;
+    padding: 0.45rem 0.75rem;
     background: transparent;
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 500;
     border-radius: var(--border-radius-sm);
     transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+/* Hide nav labels on small screens — show only icons */
+@media (max-width: 550px) {
+    .nav-item span { display: none; }
+    .nav-item { padding: 0.5rem; }
 }
 
 .nav-item:hover {
@@ -68,7 +88,7 @@
 }
 
 .nav-item.active {
-    background: var(--bg-primary);
+    background: rgba(93, 64, 55, 0.08);
     color: var(--primary);
     font-weight: 600;
 }
@@ -77,9 +97,21 @@
     background: var(--primary);
     color: #fff;
     border-radius: var(--border-radius-sm);
-    padding: 0.5rem 1.25rem;
-    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
     box-shadow: var(--shadow-sm);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Hide "New Order" text on very small screens */
+.new-order-btn .btn-label {
+    display: inline;
+}
+
+@media (max-width: 480px) {
+    .new-order-btn .btn-label { display: none; }
+    .new-order-btn { padding: 0.5rem 0.6rem; }
 }
 
 .new-order-btn:hover {

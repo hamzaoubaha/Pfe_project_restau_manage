@@ -96,7 +96,7 @@ function OrderForm({ onSubmit, onCancel }) {
                                         <option value="">Select item...</option>
                                         {menuItems.map((menuItem) => (
                                             <option key={menuItem.name} value={menuItem.name}>
-                                                {menuItem.name} - ${menuItem.price}
+                                                {menuItem.name} - {menuItem.price} DH
                                             </option>
                                         ))}
                                     </select>
@@ -111,7 +111,7 @@ function OrderForm({ onSubmit, onCancel }) {
                                     />
 
                                     <div className="item-total">
-                                        ${(item.price * item.quantity).toFixed(2)}
+                                        {(item.price * item.quantity).toFixed(0)} DH
                                     </div>
                                 </div>
 
@@ -130,7 +130,7 @@ function OrderForm({ onSubmit, onCancel }) {
 
                     <div className="form-total">
                         <span>Order Total:</span>
-                        <span className="total-value">${totalAmount.toFixed(2)}</span>
+                        <span className="total-value">{totalAmount.toFixed(0)} DH</span>
                     </div>
 
                     <div className="form-actions">

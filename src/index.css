@@ -1,23 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
   /* Elegant Earthy Palette */
   --primary: #5D4037;
-  /* Classic Brown */
   --primary-hover: #4E342E;
   --secondary: #A1887F;
-  /* Muted Bronze/Taupe */
   --bg-primary: #FAFAFA;
-  /* Off-white/Clean Paper */
   --bg-secondary: #FFFFFF;
-  /* Pure White Surface */
   --bg-tertiary: #F5F5F5;
-  /* Light Grey for Cards */
 
   --text-primary: #212121;
-  /* Soft Black */
   --text-secondary: #757575;
-  /* Grey */
   --text-muted: #BDBDBD;
 
   --success: #4CAF50;
@@ -25,22 +18,27 @@
   --danger: #F44336;
 
   --border-radius: 8px;
-  /* Sharper, more professional corners */
   --border-radius-sm: 4px;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.08);
 
   --font-heading: 'Inter', sans-serif;
-  /* Clean Modern Sans */
   --font-body: 'Inter', sans-serif;
 }
 
-
-
-* {
+/* ── Reset ── */
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* Prevent horizontal scroll on ALL elements */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
 }
 
 body {
@@ -51,52 +49,65 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Layout Container for Centering & Margins */
+/* ── Layout ── */
 .app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .main-content {
   flex: 1;
   width: 100%;
-  max-width: 1200px;
-  /* Limit width */
+  max-width: 1400px;
   margin: 0 auto;
-  /* Center */
-  padding: 2rem;
-  /* Side gutters */
+  padding: 1.5rem;
+  overflow-x: hidden;
 }
 
-h1,
-h2,
-h3,
-h4 {
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 0.75rem 0.5rem;
+  }
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4 {
   font-family: var(--font-heading);
   color: var(--primary);
-  font-weight: 500;
-  /* Lighter headings */
-  letter-spacing: -0.5px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
 }
 
+/* ── Buttons ── */
 button {
   font-family: var(--font-body);
   font-weight: 500;
-  /* Regular weight buttons */
   cursor: pointer;
   border: none;
   border-radius: var(--border-radius-sm);
   transition: all 0.2s ease;
 }
 
-/* Utilities */
 .btn {
   padding: 0.6rem 1.2rem;
   font-size: 0.95rem;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
 }
 
 .btn-primary {
@@ -108,28 +119,48 @@ button {
   background-color: var(--primary-hover);
 }
 
+.btn-secondary {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid #E0E0E0;
+}
+
+/* ── Animations ── */
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out forwards;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #E0E0E0;
-  border-radius: 3px;
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-bounce {
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-thumb { background: #E0E0E0; border-radius: 3px; }
+
+/* ── Content Grid ── */
+.content-grid {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }

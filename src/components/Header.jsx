@@ -38,7 +38,7 @@ function Header({ onNewOrder, onViewChange, currentView }) {
 
                 <button className="btn btn-primary new-order-btn" onClick={onNewOrder}>
                     <PlusCircle size={20} />
-                    <span>New Order</span>
+                    <span className="btn-label">New Order</span>
                 </button>
             </div>
         </header>

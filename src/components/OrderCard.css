@@ -166,6 +166,25 @@
     color: #fff;
 }
 
+.icon-btn.edit-btn {
+    background: #EFF6FF;
+    color: #3B82F6;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.icon-btn.edit-btn:hover {
+    background: #3B82F6;
+    color: #fff;
+}
+
 /* Success Notification Styles */
 .success-notification {
     background-color: #ECFDF5;

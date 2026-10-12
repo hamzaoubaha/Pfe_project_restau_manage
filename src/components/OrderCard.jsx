@@ -22,7 +22,7 @@ function OrderCard({ order, onUpdateStatus, onDelete, onEdit, isNew, onDismissSu
     const lockTime = order.lockedAt || new Date(new Date(order.timestamp).getTime() + 5 * 60000).toISOString()
 
     const handleEdit = () => {
-        alert('Edit functionality coming soon!')
+        onEdit(order)
     }
 
     const handleDelete = () => {
@@ -58,7 +58,7 @@ function OrderCard({ order, onUpdateStatus, onDelete, onEdit, isNew, onDismissSu
                     <div key={idx} className="order-item-row">
                         <div className="item-qty">{item.quantity}x</div>
                         <div className="item-name">{item.name}</div>
-                        <div className="item-price">${(item.price * item.quantity).toFixed(2)}</div>
+                        <div className="item-price">{(item.price * item.quantity).toFixed(0)} DH</div>
                     </div>
                 ))}
             </div>
@@ -77,7 +77,7 @@ function OrderCard({ order, onUpdateStatus, onDelete, onEdit, isNew, onDismissSu
             <div className="order-footer">
                 <div className="total-row">
                     <span>Total</span>
-                    <span className="total-amount">${order.total ? order.total.toFixed(2) : '0.00'}</span>
+                    <span className="total-amount">{order.total ? order.total.toFixed(0) : '0'} DH</span>
                 </div>
 
                 {order.status === 'pending' && (
@@ -102,6 +102,10 @@ function OrderCard({ order, onUpdateStatus, onDelete, onEdit, isNew, onDismissSu
                             ))}
                         </select>
                     </div>
+
+                    <button className="icon-btn edit-btn" onClick={handleEdit} title="Edit Order">
+                        <Edit2 size={18} />
+                    </button>
 
                     <button className="icon-btn delete-btn" onClick={handleDelete} title="Delete">
                         <Trash2 size={18} />
