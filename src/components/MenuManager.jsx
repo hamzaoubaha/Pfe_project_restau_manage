@@ -171,7 +171,7 @@ function MenuManager() {
                                             <span className="category-badge">{item.category || 'Main'}</span>
                                             <h3 className="item-title">{item.name}</h3>
                                         </div>
-                                        <div className="item-price">{item.price.toFixed(0)} DH</div>
+                                        <div className="item-price">{item.price.toFixed(0)} MAD</div>
                                     </div>
                                     <p className="item-description">{item.description}</p>
 
@@ -229,7 +229,7 @@ function MenuManager() {
                                 </div>
 
                                 <div className="form-group">
-                                    <label>Prix (DH)</label>
+                                    <label>Prix (MAD)</label>
                                     <div className="input-with-icon">
                                         <Coins size={16} className="input-icon" />
                                         <input
@@ -240,7 +240,7 @@ function MenuManager() {
                                             onChange={e => setFormData({ ...formData, price: e.target.value })}
                                             required
                                         />
-                                        <span className="currency-suffix">DH</span>
+                                        <span className="currency-suffix">MAD</span>
                                     </div>
                                 </div>
 
@@ -299,7 +299,7 @@ function MenuManager() {
                                             <span>Image preview</span>
                                         </div>
                                     )}
-                                    <span className="preview-price-tag">{formData.price || '0'} DH</span>
+                                    <span className="preview-price-tag">{formData.price || '0'} MAD</span>
                                 </div>
                                 <div className="preview-details">
                                     <span className="preview-cat">{formData.category || 'Main'}</span>

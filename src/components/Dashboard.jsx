@@ -47,7 +47,7 @@ function Dashboard({ orders }) {
             <div className="stat-card stat-revenue">
                 <div className="stat-icon"><Coins size={32} /></div>
                 <div className="stat-info">
-                    <div className="stat-value">{stats.totalRevenue.toFixed(0)} DH</div>
+                    <div className="stat-value">{stats.totalRevenue.toFixed(0)} MAD</div>
                     <div className="stat-label">Total Revenue</div>
                 </div>
             </div>

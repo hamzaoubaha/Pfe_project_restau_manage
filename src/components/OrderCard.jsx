@@ -58,7 +58,7 @@ function OrderCard({ order, onUpdateStatus, onDelete, onEdit, isNew, onDismissSu
                     <div key={idx} className="order-item-row">
                         <div className="item-qty">{item.quantity}x</div>
                         <div className="item-name">{item.name}</div>
-                        <div className="item-price">{(item.price * item.quantity).toFixed(0)} DH</div>
+                        <div className="item-price">{(item.price * item.quantity).toFixed(0)} MAD</div>
                     </div>
                 ))}
             </div>
@@ -77,7 +77,7 @@ function OrderCard({ order, onUpdateStatus, onDelete, onEdit, isNew, onDismissSu
             <div className="order-footer">
                 <div className="total-row">
                     <span>Total</span>
-                    <span className="total-amount">{order.total ? order.total.toFixed(0) : '0'} DH</span>
+                    <span className="total-amount">{order.total ? order.total.toFixed(0) : '0'} MAD</span>
                 </div>
 
                 {order.status === 'pending' && (

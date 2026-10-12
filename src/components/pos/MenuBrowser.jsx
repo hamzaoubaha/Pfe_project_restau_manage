@@ -30,7 +30,7 @@ function MenuBrowser({ menuItems, onAddToCart, cart, onOpenCart }) {
             />
             <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 600, fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
-                <div style={{ color: 'var(--secondary)', fontSize: '0.9rem', fontWeight: 700 }}>{item.price} DH</div>
+                <div style={{ color: 'var(--secondary)', fontSize: '0.9rem', fontWeight: 700 }}>{item.price} MAD</div>
             </div>
             <button
                 className="btn btn-sm"

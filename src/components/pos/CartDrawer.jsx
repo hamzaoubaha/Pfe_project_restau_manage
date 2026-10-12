@@ -33,7 +33,7 @@ function CartDrawer({
                             <div key={item.id} className="cart-item-row animate-fade-in">
                                 <div>
                                     <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{item.name}</div>
-                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{item.price.toFixed(0)} DH</div>
+                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{item.price.toFixed(0)} MAD</div>
                                 </div>
 
                                 <div className="quantity-controls">
@@ -84,7 +84,7 @@ function CartDrawer({
 
                         <div className="form-total" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', fontSize: '1.5rem', fontFamily: 'var(--font-heading)', color: 'var(--primary)' }}>
                             <span>Total</span>
-                            <span className="total-value">{totalAmount.toFixed(0)} DH</span>
+                            <span className="total-value">{totalAmount.toFixed(0)} MAD</span>
                         </div>
 
                         <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={onSubmit}>

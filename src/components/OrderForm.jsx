@@ -96,41 +96,41 @@ function OrderForm({ onSubmit, onCancel }) {
                                         <option value="">Select item...</option>
                                         {menuItems.map((menuItem) => (
                                             <option key={menuItem.name} value={menuItem.name}>
-                                                {menuItem.name} - {menuItem.price} DH
+                                                {menuItem.name} - {menuItem.price} MAD
                                             </option>
                                         ))}
-                                    </select>
+                                     </select>
 
-                                    <input
-                                        type="number"
-                                        value={item.quantity}
-                                        onChange={(e) => updateItem(index, 'quantity', e.target.value)}
-                                        min="1"
-                                        placeholder="Qty"
-                                        className="quantity-input"
-                                    />
+                                     <input
+                                         type="number"
+                                         value={item.quantity}
+                                         onChange={(e) => updateItem(index, 'quantity', e.target.value)}
+                                         min="1"
+                                         placeholder="Qty"
+                                         className="quantity-input"
+                                     />
 
-                                    <div className="item-total">
-                                        {(item.price * item.quantity).toFixed(0)} DH
-                                    </div>
-                                </div>
+                                     <div className="item-total">
+                                         {(item.price * item.quantity).toFixed(0)} MAD
+                                     </div>
+                                 </div>
 
-                                {items.length > 1 && (
-                                    <button
-                                        type="button"
-                                        className="remove-item-btn"
-                                        onClick={() => removeItem(index)}
-                                    >
-                                        🗑️
-                                    </button>
-                                )}
+                                 {items.length > 1 && (
+                                     <button
+                                         type="button"
+                                         className="remove-item-btn"
+                                         onClick={() => removeItem(index)}
+                                     >
+                                         🗑️
+                                     </button>
+                                 )}
                             </div>
                         ))}
                     </div>
 
                     <div className="form-total">
                         <span>Order Total:</span>
-                        <span className="total-value">{totalAmount.toFixed(0)} DH</span>
+                        <span className="total-value">{totalAmount.toFixed(0)} MAD</span>
                     </div>
 
                     <div className="form-actions">
