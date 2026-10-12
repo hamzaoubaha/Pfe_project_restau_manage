@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { PlusCircle, Search, Edit2, Trash2, PackagePlus, X, AlertTriangle, Package, Sparkles, Tag, Layers, Scale, BellRing, Check, Save } from 'lucide-react'
+import { PlusCircle, Search, Edit2, Trash2, PackagePlus, X, Package, Sparkles, Tag, Layers, Scale, BellRing, ArrowLeft, Save } from 'lucide-react'
 import './StockManager.css'
 
 const API = 'http://localhost:5001/api/stock'
@@ -26,47 +26,41 @@ function getBarInfo(quantity, min_quantity) {
     return { pct, cls }
 }
 
+function getCategoryEmoji(cat) {
+    switch (cat) {
+        case 'Viandes': return '🥩'
+        case 'Légumes': return '🥦'
+        case 'Fruits': return '🍎'
+        case 'Boissons': return '🥤'
+        case 'Épices': return '🌶️'
+        case 'Produits laitiers': return '🧀'
+        default: return '📦'
+    }
+}
+
 // ──────────────────────────────────────────
-// Add / Edit Modal
+// Restock Quick Modal (Clean Light Design)
 // ──────────────────────────────────────────
-function StockFormModal({ item, onClose, onSaved }) {
-    const isEdit = Boolean(item)
-    const [form, setForm] = useState({
-        name: item?.name || '',
-        quantity: item?.quantity ?? '',
-        unit: item?.unit || 'kg',
-        min_quantity: item?.min_quantity ?? 5,
-        category: item?.category || 'Ingrédients',
-    })
+function RestockModal({ item, onClose, onSaved }) {
+    const [addQty, setAddQty] = useState('')
     const [saving, setSaving] = useState(false)
 
-    const set = (key, val) => setForm(f => ({ ...f, [key]: val }))
-
-    const numQty = parseFloat(form.quantity) || 0
-    const numMin = parseFloat(form.min_quantity) || 0
-    const isStockLow = numQty <= numMin
-
-    const handleSubmit = async (e) => {
+    const handleRestock = async (e) => {
         e.preventDefault()
+        const qtyNum = parseFloat(addQty)
+        if (!qtyNum || qtyNum <= 0) return
         setSaving(true)
-        const payload = {
-            ...form,
-            name: form.name.trim(),
-            quantity: numQty,
-            min_quantity: numMin,
-            isLow: isStockLow,
-            id: item?.id || Date.now()
-        }
+
+        const newQty = (item.quantity || 0) + qtyNum
+        const isLowNow = newQty <= item.min_quantity
 
         try {
-            const url = isEdit ? `${API}/${item.id}` : API
-            const method = isEdit ? 'PUT' : 'POST'
             const controller = new AbortController()
             const timer = setTimeout(() => controller.abort(), 2000)
-            const res = await fetch(url, {
-                method,
+            const res = await fetch(`${API}/${item.id}`, {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
+                body: JSON.stringify({ quantity: newQty }),
                 signal: controller.signal
             })
             clearTimeout(timer)
@@ -76,213 +70,46 @@ function StockFormModal({ item, onClose, onSaved }) {
                 return
             }
         } catch (err) {
-            console.log('Stock API offline, updating locally:', err.message)
+            console.log('Restock API offline, updating locally')
         }
 
-        // Offline / fallback handling
-        onSaved(payload)
+        onSaved({ ...item, quantity: newQty, isLow: isLowNow })
         onClose()
         setSaving(false)
     }
 
     return (
-        <div className="stock-modal-overlay" onClick={onClose}>
-            <div className="stock-modal enhanced-stock-modal" onClick={e => e.stopPropagation()}>
-                <div className="modal-header-luxury">
-                    <div className="modal-title-wrap">
-                        <div className="modal-title-icon-box">
-                            {isEdit ? <Edit2 size={20} /> : <Sparkles size={20} />}
-                        </div>
-                        <div>
-                            <h3 className="modal-title-text">
-                                {isEdit ? 'Modifier l\'article de stock' : 'Nouvel article de stock'}
-                            </h3>
-                            <p className="modal-subtitle-text">
-                                {isEdit ? 'Mettez à jour les niveaux et seuils' : 'Remplissez les détails pour ajouter au magasin'}
-                            </p>
-                        </div>
-                    </div>
-                    <button className="modal-close-btn-luxury" onClick={onClose} aria-label="Fermer">
-                        <X size={18} />
-                    </button>
+        <div className="restock-modal-overlay" onClick={onClose}>
+            <div className="restock-modal-card" onClick={e => e.stopPropagation()}>
+                <div className="restock-header">
+                    <h3>📦 Réapprovisionner le Stock</h3>
+                    <button className="restock-close-btn" onClick={onClose}><X size={20} /></button>
                 </div>
-
-                {/* Live Status Preview Banner */}
-                <div className={`stock-live-badge-card ${isStockLow ? 'alert-low' : 'status-ok'}`}>
-                    <div className="live-badge-left">
-                        <span className="live-badge-pill">{form.category || 'Ingrédients'}</span>
-                        <h4 className="live-badge-name">{form.name || 'Nom de l\'article'}</h4>
-                    </div>
-                    <div className="live-badge-right">
-                        <span className="live-badge-qty">
-                            {numQty} <small>{form.unit}</small>
-                        </span>
-                        <span className="live-status-tag">
-                            {isStockLow ? '⚠️ Seuil d\'alerte' : '✓ Stock satisfaisant'}
-                        </span>
-                    </div>
-                </div>
-
-                <form className="modal-form-luxury" onSubmit={handleSubmit}>
-                    <div className="form-group-luxury">
-                        <label className="form-label-luxury">
-                            <Tag size={15} /> Nom de l'article <span className="req">*</span>
-                        </label>
-                        <div className="input-wrap-luxury">
-                            <input
-                                type="text"
-                                className="form-input-luxury"
-                                value={form.name}
-                                onChange={e => set('name', e.target.value)}
-                                placeholder="Ex: Viande hachée, Pain burger, Fromage..."
-                                required
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group-luxury">
-                        <label className="form-label-luxury">
-                            <Layers size={15} /> Catégorie
-                        </label>
-                        <div className="input-wrap-luxury">
-                            <select
-                                className="form-input-luxury select-luxury"
-                                value={form.category}
-                                onChange={e => set('category', e.target.value)}
-                            >
-                                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="modal-form-grid-luxury">
-                        <div className="form-group-luxury">
-                            <label className="form-label-luxury">
-                                <Scale size={15} /> Quantité actuelle <span className="req">*</span>
-                            </label>
-                            <div className="input-wrap-luxury">
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    className="form-input-luxury"
-                                    value={form.quantity}
-                                    onChange={e => set('quantity', e.target.value)}
-                                    placeholder="0"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-group-luxury">
-                            <label className="form-label-luxury">
-                                <Package size={15} /> Unité de mesure
-                            </label>
-                            <div className="input-wrap-luxury">
-                                <select
-                                    className="form-input-luxury select-luxury"
-                                    value={form.unit}
-                                    onChange={e => set('unit', e.target.value)}
-                                >
-                                    {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="form-group-luxury">
-                        <div className="label-with-tip">
-                            <label className="form-label-luxury">
-                                <BellRing size={15} /> Seuil d'alerte minimale <span className="req">*</span>
-                            </label>
-                            <span className="field-hint">Alerte dès que le stock descend sous cette valeur</span>
-                        </div>
-                        <div className="input-wrap-luxury">
-                            <input
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                className="form-input-luxury"
-                                value={form.min_quantity}
-                                onChange={e => set('min_quantity', e.target.value)}
-                                placeholder="5"
-                                required
-                            />
-                            <span className="input-addon-luxury">{form.unit}</span>
-                        </div>
-                    </div>
-
-                    <div className="modal-footer-luxury">
-                        <button type="button" className="btn-cancel-luxury" onClick={onClose}>
-                            Annuler
-                        </button>
-                        <button type="submit" className="btn-save-luxury" disabled={saving}>
-                            <Save size={17} />
-                            {saving ? 'Enregistrement...' : (isEdit ? 'Mettre à jour' : 'Ajouter au Stock')}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    )
-}
-
-// ──────────────────────────────────────────
-// Restock Modal (quick add quantity)
-// ──────────────────────────────────────────
-function RestockModal({ item, onClose, onSaved }) {
-    const [addQty, setAddQty] = useState('')
-    const [saving, setSaving] = useState(false)
-
-    const handleRestock = async (e) => {
-        e.preventDefault()
-        if (!addQty || parseFloat(addQty) <= 0) return
-        setSaving(true)
-        try {
-            const newQty = item.quantity + parseFloat(addQty)
-            const res = await fetch(`${API}/${item.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quantity: newQty }),
-            })
-            if (res.ok) { onSaved(); onClose() }
-        } catch (err) {
-            console.error(err)
-        } finally {
-            setSaving(false)
-        }
-    }
-
-    return (
-        <div className="stock-modal-overlay" onClick={onClose}>
-            <div className="stock-modal" onClick={e => e.stopPropagation()}>
-                <div className="modal-header">
-                    <h3>📦 Réapprovisionner</h3>
-                    <button className="modal-close-btn" onClick={onClose}><X size={20} /></button>
-                </div>
-                <div className="restock-info">
+                <div className="restock-info-box">
                     Article : <strong>{item.name}</strong><br />
                     Stock actuel : <strong>{item.quantity} {item.unit}</strong>
                 </div>
-                <form className="modal-form" onSubmit={handleRestock}>
-                    <div className="form-group">
+                <form onSubmit={handleRestock}>
+                    <div className="stock-form-group">
                         <label>Quantité à ajouter ({item.unit})</label>
-                        <input
-                            type="number"
-                            step="0.01"
-                            min="0.01"
-                            value={addQty}
-                            onChange={e => setAddQty(e.target.value)}
-                            placeholder="ex: 10"
-                            autoFocus
-                            required
-                        />
+                        <div className="stock-input-wrap">
+                            <input
+                                type="number"
+                                step="0.01"
+                                min="0.01"
+                                value={addQty}
+                                onChange={e => setAddQty(e.target.value)}
+                                placeholder="ex: 10"
+                                autoFocus
+                                required
+                            />
+                            <span className="stock-input-suffix">{item.unit}</span>
+                        </div>
                     </div>
-                    <div className="modal-footer">
+                    <div className="restock-footer">
                         <button type="button" className="btn btn-secondary" onClick={onClose}>Annuler</button>
                         <button type="submit" className="btn btn-primary" disabled={saving}>
-                            {saving ? 'En cours...' : '✓ Confirmer Réappro.'}
+                            {saving ? 'En cours...' : '✓ Confirmer'}
                         </button>
                     </div>
                 </form>
@@ -292,14 +119,28 @@ function RestockModal({ item, onClose, onSaved }) {
 }
 
 // ──────────────────────────────────────────
+// Main StockManager Component
+// ──────────────────────────────────────────
 function StockManager() {
+    const [view, setView] = useState('list') // 'list' | 'form'
     const [items, setItems] = useState(INITIAL_FALLBACK_STOCK)
     const [search, setSearch] = useState('')
     const [filterCat, setFilterCat] = useState('Toutes')
     const [showLowOnly, setShowLowOnly] = useState(false)
 
-    const [modal, setModal] = useState(null) // null | 'add' | 'edit' | 'restock'
-    const [selectedItem, setSelectedItem] = useState(null)
+    // Form State (Matches MenuManager exact pattern)
+    const [editingItem, setEditingItem] = useState(null)
+    const [formData, setFormData] = useState({
+        name: '',
+        quantity: '',
+        unit: 'kg',
+        min_quantity: 5,
+        category: 'Ingrédients'
+    })
+    const [saving, setSaving] = useState(false)
+
+    // Restock Modal
+    const [restockItem, setRestockItem] = useState(null)
 
     useEffect(() => { fetchStock() }, [])
 
@@ -320,16 +161,85 @@ function StockManager() {
         }
     }
 
-    const handleSavedItem = (savedPayload) => {
-        fetchStock()
-        if (savedPayload) {
-            setItems(prev => {
-                const exists = prev.some(i => i.id === savedPayload.id)
-                if (exists) {
-                    return prev.map(i => i.id === savedPayload.id ? { ...i, ...savedPayload } : i)
-                }
-                return [savedPayload, ...prev]
+    const handleOpenAdd = () => {
+        setEditingItem(null)
+        setFormData({
+            name: '',
+            quantity: '',
+            unit: 'kg',
+            min_quantity: 5,
+            category: 'Ingrédients'
+        })
+        setView('form')
+    }
+
+    const handleOpenEdit = (item) => {
+        setEditingItem(item)
+        setFormData({
+            name: item.name,
+            quantity: item.quantity,
+            unit: item.unit || 'kg',
+            min_quantity: item.min_quantity || 5,
+            category: item.category || 'Ingrédients'
+        })
+        setView('form')
+    }
+
+    const handleFormSubmit = async (e) => {
+        e.preventDefault()
+        setSaving(true)
+
+        const numQty = parseFloat(formData.quantity) || 0
+        const numMin = parseFloat(formData.min_quantity) || 0
+        const isLow = numQty <= numMin
+
+        const payload = {
+            ...formData,
+            name: formData.name.trim(),
+            quantity: numQty,
+            min_quantity: numMin,
+            isLow,
+            id: editingItem?.id || Date.now()
+        }
+
+        try {
+            const url = editingItem ? `${API}/${editingItem.id}` : API
+            const method = editingItem ? 'PUT' : 'POST'
+            const controller = new AbortController()
+            const timer = setTimeout(() => controller.abort(), 2000)
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                signal: controller.signal
             })
+            clearTimeout(timer)
+            if (res.ok) {
+                fetchStock()
+                setView('list')
+                setSaving(false)
+                return
+            }
+        } catch (err) {
+            console.log('Stock API offline, saving locally')
+        }
+
+        // Local state update
+        setItems(prev => {
+            if (editingItem) {
+                return prev.map(i => i.id === editingItem.id ? { ...i, ...payload } : i)
+            }
+            return [payload, ...prev]
+        })
+
+        setView('list')
+        setSaving(false)
+    }
+
+    const handleRestockSaved = (updatedItem) => {
+        fetchStock()
+        if (updatedItem) {
+            setItems(prev => prev.map(i => i.id === updatedItem.id ? { ...i, ...updatedItem } : i))
         }
     }
 
@@ -356,206 +266,328 @@ function StockManager() {
     const lowItems = items.filter(i => i.isLow).length
     const okItems = totalItems - lowItems
 
+    // Live preview values
+    const previewQty = parseFloat(formData.quantity) || 0
+    const previewMin = parseFloat(formData.min_quantity) || 0
+    const previewIsLow = previewQty <= previewMin
+
     return (
         <div className="stock-manager animate-fade-in">
+            {view === 'list' ? (
+                <>
+                    {/* Low Stock Alert Banner */}
+                    {lowItems > 0 && (
+                        <div className="stock-alert-banner">
+                            <span className="alert-icon">⚠️</span>
+                            <span>
+                                <strong>{lowItems} article{lowItems > 1 ? 's' : ''}</strong> en rupture ou stock faible —
+                                pensez à réapprovisionner !
+                            </span>
+                            <button
+                                className="btn btn-sm"
+                                style={{ marginLeft: 'auto', background: '#FED7D7', color: '#C53030', border: '1px solid #FEB2B2', borderRadius: '8px', padding: '0.35rem 0.85rem', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}
+                                onClick={() => setShowLowOnly(v => !v)}
+                            >
+                                {showLowOnly ? 'Voir tout' : 'Voir les alertes'}
+                            </button>
+                        </div>
+                    )}
 
-            {/* Low Stock Alert Banner */}
-            {lowItems > 0 && (
-                <div className="stock-alert-banner">
-                    <span className="alert-icon">⚠️</span>
-                    <span>
-                        <strong>{lowItems} article{lowItems > 1 ? 's' : ''}</strong> en rupture ou stock faible —
-                        pensez à réapprovisionner !
-                    </span>
-                    <button
-                        className="btn btn-sm"
-                        style={{ marginLeft: 'auto', background: '#ff6b6b22', color: '#ff6b6b', border: '1px solid #ff6b6b44', borderRadius: '8px', padding: '0.3rem 0.8rem', cursor: 'pointer', fontSize: '0.8rem' }}
-                        onClick={() => setShowLowOnly(v => !v)}
-                    >
-                        {showLowOnly ? 'Voir tout' : 'Voir les alertes'}
-                    </button>
-                </div>
-            )}
-
-            {/* Header */}
-            <div className="stock-header">
-                <div className="stock-header-left">
-                    <h2>📦 Gestion de Stock</h2>
-                    <p>Suivez et gérez les ingrédients de votre restaurant</p>
-                </div>
-                <button className="btn btn-primary" onClick={() => { setSelectedItem(null); setModal('add') }}>
-                    <PlusCircle size={18} /> Ajouter Article
-                </button>
-            </div>
-
-            {/* Summary Cards */}
-            <div className="stock-summary">
-                <div className="summary-card">
-                    <span className="summary-icon">📦</span>
-                    <div>
-                        <div className="summary-value">{totalItems}</div>
-                        <div className="summary-label">Articles total</div>
+                    {/* Header */}
+                    <div className="stock-header">
+                        <div className="stock-header-left">
+                            <h2>📦 Gestion de Stock</h2>
+                            <p>Suivez et gérez les ingrédients et matières premières</p>
+                        </div>
+                        <button className="btn btn-primary" onClick={handleOpenAdd}>
+                            <PlusCircle size={18} /> Ajouter Article
+                        </button>
                     </div>
-                </div>
-                <div className="summary-card success">
-                    <span className="summary-icon">✅</span>
-                    <div>
-                        <div className="summary-value">{okItems}</div>
-                        <div className="summary-label">Stock OK</div>
+
+                    {/* Summary Cards */}
+                    <div className="stock-summary">
+                        <div className="summary-card">
+                            <span className="summary-icon">📦</span>
+                            <div>
+                                <div className="summary-value">{totalItems}</div>
+                                <div className="summary-label">Articles en catalogue</div>
+                            </div>
+                        </div>
+                        <div className="summary-card success">
+                            <span className="summary-icon">✅</span>
+                            <div>
+                                <div className="summary-value">{okItems}</div>
+                                <div className="summary-label">Stock suffisant</div>
+                            </div>
+                        </div>
+                        <div className="summary-card danger">
+                            <span className="summary-icon">🔴</span>
+                            <div>
+                                <div className="summary-value">{lowItems}</div>
+                                <div className="summary-label">Articles à commander</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div className="summary-card danger">
-                    <span className="summary-icon">🔴</span>
-                    <div>
-                        <div className="summary-value">{lowItems}</div>
-                        <div className="summary-label">Stock faible</div>
+
+                    {/* Filters */}
+                    <div className="stock-filters">
+                        <div className="stock-search">
+                            <Search size={16} className="search-icon" />
+                            <input
+                                type="text"
+                                placeholder="Rechercher un article..."
+                                value={search}
+                                onChange={e => setSearch(e.target.value)}
+                            />
+                        </div>
+                        <select
+                            className="filter-select"
+                            value={filterCat}
+                            onChange={e => setFilterCat(e.target.value)}
+                        >
+                            <option value="Toutes">Toutes catégories</option>
+                            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
                     </div>
-                </div>
-            </div>
 
-            {/* Filters */}
-            <div className="stock-filters">
-                <div className="stock-search">
-                    <Search size={16} className="search-icon" />
-                    <input
-                        type="text"
-                        placeholder="Rechercher un article..."
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                    />
-                </div>
-                <select
-                    className="filter-select"
-                    value={filterCat}
-                    onChange={e => setFilterCat(e.target.value)}
-                >
-                    <option value="Toutes">Toutes catégories</option>
-                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-            </div>
-
-            {/* Table */}
-            <div className="stock-table-wrapper">
-                {filtered.length === 0 ? (
-                    <div className="stock-empty">
-                        <div className="empty-icon"><Package size={56} strokeWidth={1} /></div>
-                        <h3>Aucun article trouvé</h3>
-                        <p>Ajoutez votre premier article ou modifiez les filtres</p>
-                    </div>
-                ) : (
-                    <table className="stock-table">
-                        <thead>
-                            <tr>
-                                <th>Article</th>
-                                <th>Catégorie</th>
-                                <th>Quantité en stock</th>
-                                <th>Seuil min.</th>
-                                <th>Statut</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filtered.map(item => {
-                                const { pct, cls } = getBarInfo(item.quantity, item.min_quantity)
-                                return (
-                                    <tr key={item.id} className={item.isLow ? 'low-stock-row' : ''}>
-                                        {/* Name */}
-                                        <td>
-                                            <div className="item-name-cell">
-                                                <span style={{ fontSize: '1.3rem' }}>
-                                                    {item.category === 'Viandes' ? '🥩' :
-                                                     item.category === 'Légumes' ? '🥦' :
-                                                     item.category === 'Fruits' ? '🍎' :
-                                                     item.category === 'Boissons' ? '🥤' :
-                                                     item.category === 'Épices' ? '🌶️' :
-                                                     item.category === 'Produits laitiers' ? '🧀' : '📦'}
-                                                </span>
-                                                <strong>{item.name}</strong>
-                                            </div>
-                                        </td>
-
-                                        {/* Category */}
-                                        <td>
-                                            <span className="item-category-badge">{item.category}</span>
-                                        </td>
-
-                                        {/* Quantity + bar */}
-                                        <td>
-                                            <div className="quantity-display">
-                                                <div className="quantity-bar">
-                                                    <div
-                                                        className={`quantity-fill ${cls}`}
-                                                        style={{ width: `${pct}%` }}
-                                                    />
-                                                </div>
-                                                <span className="quantity-text">
-                                                    {item.quantity} {item.unit}
-                                                </span>
-                                            </div>
-                                        </td>
-
-                                        {/* Min */}
-                                        <td style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                                            {item.min_quantity} {item.unit}
-                                        </td>
-
-                                        {/* Status */}
-                                        <td>
-                                            {item.isLow ? (
-                                                <span className="status-badge low">⚠️ Stock faible</span>
-                                            ) : (
-                                                <span className="status-badge ok">✓ OK</span>
-                                            )}
-                                        </td>
-
-                                        {/* Actions */}
-                                        <td>
-                                            <div className="table-actions">
-                                                <button
-                                                    className="icon-btn restock"
-                                                    title="Réapprovisionner"
-                                                    onClick={() => { setSelectedItem(item); setModal('restock') }}
-                                                >
-                                                    <PackagePlus size={16} />
-                                                </button>
-                                                <button
-                                                    className="icon-btn edit"
-                                                    title="Modifier"
-                                                    onClick={() => { setSelectedItem(item); setModal('edit') }}
-                                                >
-                                                    <Edit2 size={16} />
-                                                </button>
-                                                <button
-                                                    className="icon-btn delete"
-                                                    title="Supprimer"
-                                                    onClick={() => handleDelete(item.id)}
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
-                                        </td>
+                    {/* Table */}
+                    <div className="stock-table-wrapper">
+                        {filtered.length === 0 ? (
+                            <div className="stock-empty">
+                                <div className="empty-icon"><Package size={56} strokeWidth={1} /></div>
+                                <h3>Aucun article trouvé</h3>
+                                <p>Ajoutez votre premier article de stock ou ajustez les filtres</p>
+                            </div>
+                        ) : (
+                            <table className="stock-table">
+                                <thead>
+                                    <tr>
+                                        <th>Article</th>
+                                        <th>Catégorie</th>
+                                        <th>Quantité en stock</th>
+                                        <th>Seuil min.</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
                                     </tr>
-                                )
-                            })}
-                        </tbody>
-                    </table>
-                )}
-            </div>
+                                </thead>
+                                <tbody>
+                                    {filtered.map(item => {
+                                        const { pct, cls } = getBarInfo(item.quantity, item.min_quantity)
+                                        return (
+                                            <tr key={item.id} className={item.isLow ? 'low-stock-row' : ''}>
+                                                <td>
+                                                    <div className="item-name-cell">
+                                                        <span style={{ fontSize: '1.3rem' }}>
+                                                            {getCategoryEmoji(item.category)}
+                                                        </span>
+                                                        <strong>{item.name}</strong>
+                                                    </div>
+                                                </td>
 
-            {/* Modals */}
-            {(modal === 'add' || modal === 'edit') && (
-                <StockFormModal
-                    item={modal === 'edit' ? selectedItem : null}
-                    onClose={() => setModal(null)}
-                    onSaved={handleSavedItem}
-                />
+                                                <td>
+                                                    <span className="item-category-badge">{item.category}</span>
+                                                </td>
+
+                                                <td>
+                                                    <div className="quantity-display">
+                                                        <div className="quantity-bar">
+                                                            <div
+                                                                className={`quantity-fill ${cls}`}
+                                                                style={{ width: `${pct}%` }}
+                                                            />
+                                                        </div>
+                                                        <span className="quantity-text">
+                                                            {item.quantity} {item.unit}
+                                                        </span>
+                                                    </div>
+                                                </td>
+
+                                                <td style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 500 }}>
+                                                    {item.min_quantity} {item.unit}
+                                                </td>
+
+                                                <td>
+                                                    {item.isLow ? (
+                                                        <span className="status-badge low">⚠️ Stock faible</span>
+                                                    ) : (
+                                                        <span className="status-badge ok">✓ OK</span>
+                                                    )}
+                                                </td>
+
+                                                <td>
+                                                    <div className="table-actions">
+                                                        <button
+                                                            className="icon-btn restock"
+                                                            title="Réapprovisionner"
+                                                            onClick={() => setRestockItem(item)}
+                                                        >
+                                                            <PackagePlus size={16} />
+                                                        </button>
+                                                        <button
+                                                            className="icon-btn edit"
+                                                            title="Modifier"
+                                                            onClick={() => handleOpenEdit(item)}
+                                                        >
+                                                            <Edit2 size={16} />
+                                                        </button>
+                                                        <button
+                                                            className="icon-btn delete"
+                                                            title="Supprimer"
+                                                            onClick={() => handleDelete(item.id)}
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+                </>
+            ) : (
+                /* ==========================================================
+                   Full Page Form (Exact MenuManager Luxury Pattern)
+                   ========================================================== */
+                <div className="stock-form-page-container">
+                    <div className="stock-form-header-bar">
+                        <button className="stock-back-btn" onClick={() => setView('list')}>
+                            <ArrowLeft size={18} /> Retour au Stock
+                        </button>
+                        <h3 className="stock-form-title-clean">
+                            <Sparkles size={20} className="title-icon" />
+                            {editingItem ? 'Modifier l\'article de stock' : 'Ajouter un nouvel article de stock'}
+                        </h3>
+                    </div>
+
+                    <div className="stock-form-layout-wrapper">
+                        <form className="stock-form-content" onSubmit={handleFormSubmit}>
+                            <div className="stock-form-grid">
+                                <div className="stock-form-group stock-full-width">
+                                    <label>Nom de l'article *</label>
+                                    <div className="stock-input-wrap">
+                                        <Tag size={16} className="stock-input-icon" />
+                                        <input
+                                            type="text"
+                                            placeholder="Ex: Viande hachée, Farine T55, Sauce tomate..."
+                                            value={formData.name}
+                                            onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                            required
+                                            autoFocus
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="stock-form-group">
+                                    <label>Catégorie</label>
+                                    <div className="stock-input-wrap">
+                                        <Layers size={16} className="stock-input-icon" />
+                                        <select
+                                            value={formData.category}
+                                            onChange={e => setFormData({ ...formData, category: e.target.value })}
+                                        >
+                                            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="stock-form-group">
+                                    <label>Unité de mesure</label>
+                                    <div className="stock-input-wrap">
+                                        <Package size={16} className="stock-input-icon" />
+                                        <select
+                                            value={formData.unit}
+                                            onChange={e => setFormData({ ...formData, unit: e.target.value })}
+                                        >
+                                            {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="stock-form-group">
+                                    <label>Quantité actuelle *</label>
+                                    <div className="stock-input-wrap">
+                                        <Scale size={16} className="stock-input-icon" />
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            placeholder="0"
+                                            value={formData.quantity}
+                                            onChange={e => setFormData({ ...formData, quantity: e.target.value })}
+                                            required
+                                        />
+                                        <span className="stock-input-suffix">{formData.unit}</span>
+                                    </div>
+                                </div>
+
+                                <div className="stock-form-group">
+                                    <label>Seuil d'alerte minimale *</label>
+                                    <div className="stock-input-wrap">
+                                        <BellRing size={16} className="stock-input-icon" />
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            placeholder="5"
+                                            value={formData.min_quantity}
+                                            onChange={e => setFormData({ ...formData, min_quantity: e.target.value })}
+                                            required
+                                        />
+                                        <span className="stock-input-suffix">{formData.unit}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" className="stock-save-btn" disabled={saving}>
+                                <Save size={18} />
+                                {saving ? 'Enregistrement...' : (editingItem ? 'Mettre à jour l\'article' : 'Enregistrer dans le Stock')}
+                            </button>
+                        </form>
+
+                        {/* Side Live Preview Panel (Just like MenuManager) */}
+                        <div className="stock-preview-panel">
+                            <span className="stock-preview-label">Aperçu en direct (Live Preview)</span>
+                            <div className="stock-preview-card">
+                                <div className="stock-preview-top">
+                                    <div className="stock-preview-icon-circle">
+                                        {getCategoryEmoji(formData.category)}
+                                    </div>
+                                    <div className="stock-preview-title-box">
+                                        <span className="stock-preview-cat">{formData.category}</span>
+                                        <h4 className="stock-preview-name">{formData.name || 'Nom de l\'article'}</h4>
+                                    </div>
+                                </div>
+
+                                <div className="stock-preview-metrics">
+                                    <div className="stock-metric-col">
+                                        <span className="stock-metric-title">En Stock</span>
+                                        <span className="stock-metric-val">{previewQty} <small>{formData.unit}</small></span>
+                                    </div>
+                                    <div className="stock-metric-col">
+                                        <span className="stock-metric-title">Seuil Min.</span>
+                                        <span className="stock-metric-val">{previewMin} <small>{formData.unit}</small></span>
+                                    </div>
+                                </div>
+
+                                <div className={`stock-preview-status ${previewIsLow ? 'low' : 'ok'}`}>
+                                    <span>Statut estimé</span>
+                                    <span>{previewIsLow ? '⚠️ Seuil d\'alerte' : '✓ Stock suffisant'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
 
-            {modal === 'restock' && selectedItem && (
+            {/* Restock Modal */}
+            {restockItem && (
                 <RestockModal
-                    item={selectedItem}
-                    onClose={() => setModal(null)}
-                    onSaved={fetchStock}
+                    item={restockItem}
+                    onClose={() => setRestockItem(null)}
+                    onSaved={handleRestockSaved}
                 />
             )}
         </div>
