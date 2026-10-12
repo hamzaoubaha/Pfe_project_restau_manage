@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
-import { PlusCircle, Trash2, Image, Tag, DollarSign, Search, Edit2, ArrowLeft, Save, Coffee, Utensils, Salad, Cake } from 'lucide-react'
+import { PlusCircle, Trash2, Image, Tag, Coins, Search, Edit2, ArrowLeft, Save, Coffee, Utensils, Salad, Cake, Sparkles } from 'lucide-react'
 import './MenuManager.css'
+import { defaultMenuItems } from '../defaultMenu'
 
 function MenuManager() {
     const [view, setView] = useState('list') // 'list' | 'form'
-    const [items, setItems] = useState([])
+    const [items, setItems] = useState(defaultMenuItems)
     const [editingId, setEditingId] = useState(null)
 
     // Search & Filter State
@@ -30,9 +31,11 @@ function MenuManager() {
         try {
             const response = await fetch('http://localhost:5001/api/menu')
             const data = await response.json()
-            setItems(data)
+            if (Array.isArray(data) && data.length > 0) {
+                setItems(data)
+            }
         } catch (error) {
-            console.error('Error fetching menu:', error)
+            console.log('Using default Moroccan snack menu for MenuManager')
         }
     }
 
@@ -187,90 +190,125 @@ function MenuManager() {
                 </>
             ) : (
                 <div className="form-container">
-                    <button className="back-btn" onClick={() => setView('list')}>
-                        <ArrowLeft size={18} /> Back to Menu
-                    </button>
+                    <div className="form-header-bar">
+                        <button className="back-btn" onClick={() => setView('list')}>
+                            <ArrowLeft size={18} /> Back to Menu
+                        </button>
+                        <h3 className="form-title-clean">
+                            <Sparkles size={20} className="title-icon" />
+                            {editingId ? 'Modifier le plat' : 'Ajouter un nouvel article'}
+                        </h3>
+                    </div>
 
-                    <form className="add-item-form" onSubmit={handleSubmit}>
-                        <h3 className="form-title">{editingId ? 'Edit Dish' : 'Add New Dish'}</h3>
-
-                        <div className="form-grid">
-                            <div className="form-group">
-                                <label>Dish Name</label>
-                                <input
-                                    type="text"
-                                    value={formData.name}
-                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                    required
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Category</label>
-                                <div className="input-with-icon">
-                                    <Utensils size={16} className="input-icon" />
-                                    <select
-                                        value={formData.category}
-                                        onChange={e => setFormData({ ...formData, category: e.target.value })}
-                                        className="category-select"
-                                    >
-                                        {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label>Price (DH)</label>
-                                <div className="input-with-icon">
-                                    <DollarSign size={16} className="input-icon" />
+                    <div className="form-layout-wrapper">
+                        <form className="add-item-form" onSubmit={handleSubmit}>
+                            <div className="form-grid">
+                                <div className="form-group full-width">
+                                    <label>Nom du plat / Article</label>
                                     <input
-                                        type="number"
-                                        step="0.01"
-                                        value={formData.price}
-                                        onChange={e => setFormData({ ...formData, price: e.target.value })}
+                                        type="text"
+                                        placeholder="مثال: طاكوس ميكس أو برجر دجاج"
+                                        value={formData.name}
+                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
                                         required
                                     />
                                 </div>
-                            </div>
 
-                            <div className="form-group">
-                                <label>Image URL</label>
-                                <div className="input-with-icon">
-                                    <Image size={16} className="input-icon" />
-                                    <input
-                                        type="url"
-                                        value={formData.imageUrl}
-                                        onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
+                                <div className="form-group">
+                                    <label>Catégorie</label>
+                                    <div className="input-with-icon">
+                                        <Utensils size={16} className="input-icon" />
+                                        <select
+                                            value={formData.category}
+                                            onChange={e => setFormData({ ...formData, category: e.target.value })}
+                                            className="category-select"
+                                        >
+                                            {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Prix (DH)</label>
+                                    <div className="input-with-icon">
+                                        <Coins size={16} className="input-icon" />
+                                        <input
+                                            type="number"
+                                            step="1"
+                                            placeholder="35"
+                                            value={formData.price}
+                                            onChange={e => setFormData({ ...formData, price: e.target.value })}
+                                            required
+                                        />
+                                        <span className="currency-suffix">DH</span>
+                                    </div>
+                                </div>
+
+                                <div className="form-group full-width">
+                                    <label>Lien de l'image (URL)</label>
+                                    <div className="input-with-icon">
+                                        <Image size={16} className="input-icon" />
+                                        <input
+                                            type="url"
+                                            placeholder="https://images.unsplash.com/..."
+                                            value={formData.imageUrl}
+                                            onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-group full-width">
+                                    <label>Description</label>
+                                    <textarea
+                                        placeholder="وصف شهي للمكونات والمذاق..."
+                                        value={formData.description}
+                                        onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                        rows="3"
                                     />
+                                </div>
+
+                                <div className="form-group full-width">
+                                    <label>Ingrédients (séparés par des virgules)</label>
+                                    <div className="input-with-icon">
+                                        <Tag size={16} className="input-icon" />
+                                        <input
+                                            type="text"
+                                            placeholder="خبز، جبن، دجاج، صوص..."
+                                            value={formData.ingredients}
+                                            onChange={e => setFormData({ ...formData, ingredients: e.target.value })}
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="form-group full-width">
-                                <label>Description</label>
-                                <textarea
-                                    value={formData.description}
-                                    onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                    rows="3"
-                                />
-                            </div>
+                            <button type="submit" className="btn btn-primary save-btn">
+                                <Save size={18} /> {editingId ? 'Enregistrer les modifications' : 'Ajouter au Menu'}
+                            </button>
+                        </form>
 
-                            <div className="form-group full-width">
-                                <label>Ingredients (comma separated)</label>
-                                <div className="input-with-icon">
-                                    <Tag size={16} className="input-icon" />
-                                    <input
-                                        type="text"
-                                        value={formData.ingredients}
-                                        onChange={e => setFormData({ ...formData, ingredients: e.target.value })}
-                                    />
+                        {/* Live Preview Card */}
+                        <div className="form-preview-panel">
+                            <span className="preview-label">Aperçu en direct (Live Preview)</span>
+                            <div className="preview-card">
+                                <div className="preview-img-box">
+                                    {formData.imageUrl ? (
+                                        <img src={formData.imageUrl} alt="Preview" onError={(e) => { e.target.style.display = 'none'; }} />
+                                    ) : (
+                                        <div className="preview-placeholder">
+                                            <Utensils size={36} />
+                                            <span>Image preview</span>
+                                        </div>
+                                    )}
+                                    <span className="preview-price-tag">{formData.price || '0'} DH</span>
+                                </div>
+                                <div className="preview-details">
+                                    <span className="preview-cat">{formData.category || 'Main'}</span>
+                                    <h4 className="preview-name">{formData.name || 'Nom du plat'}</h4>
+                                    <p className="preview-desc">{formData.description || 'La description apparaîtra ici...'}</p>
                                 </div>
                             </div>
                         </div>
-
-                        <button type="submit" className="btn btn-primary save-btn">
-                            <Save size={18} /> {editingId ? 'Update Dish' : 'Save Dish'}
-                        </button>
-                    </form>
+                    </div>
                 </div>
             )}
         </div>

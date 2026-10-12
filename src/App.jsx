@@ -9,12 +9,13 @@ import StockManager from './components/StockManager'
 import OrderSetup from './components/pos/OrderSetup'
 import MenuBrowser from './components/pos/MenuBrowser'
 import CartDrawer from './components/pos/CartDrawer'
+import { defaultMenuItems } from './defaultMenu'
 
 function App() {
   // Views: 'dashboard', 'menu_manager', 'pos_setup', 'pos_ordering'
   const [view, setView] = useState('dashboard')
   const [orders, setOrders] = useState([])
-  const [menuItems, setMenuItems] = useState([])
+  const [menuItems, setMenuItems] = useState(defaultMenuItems)
 
   // POS State
   const [currentOrder, setCurrentOrder] = useState({
@@ -43,8 +44,12 @@ function App() {
     try {
       const res = await fetch('http://localhost:5001/api/menu')
       const data = await res.json()
-      setMenuItems(data)
-    } catch (err) { console.error(err) }
+      if (Array.isArray(data) && data.length > 0) {
+        setMenuItems(data)
+      }
+    } catch (err) {
+      console.log('Using default Moroccan snack menu')
+    }
   }
 
   // Edit Mode State

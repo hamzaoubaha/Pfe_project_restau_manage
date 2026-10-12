@@ -1,4 +1,4 @@
-import { Clock, ChefHat, CheckCircle, Package, DollarSign } from 'lucide-react'
+import { Clock, ChefHat, CheckCircle, Package, Coins } from 'lucide-react'
 import './Dashboard.css'
 
 function Dashboard({ orders }) {
@@ -45,7 +45,7 @@ function Dashboard({ orders }) {
             </div>
 
             <div className="stat-card stat-revenue">
-                <div className="stat-icon"><DollarSign size={32} /></div>
+                <div className="stat-icon"><Coins size={32} /></div>
                 <div className="stat-info">
                     <div className="stat-value">{stats.totalRevenue.toFixed(0)} DH</div>
                     <div className="stat-label">Total Revenue</div>

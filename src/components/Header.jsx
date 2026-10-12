@@ -1,12 +1,20 @@
-import { LayoutDashboard, UtensilsCrossed, PlusCircle, Warehouse } from 'lucide-react'
+import { LayoutDashboard, UtensilsCrossed, PlusCircle, Warehouse, Utensils } from 'lucide-react'
 import './Header.css'
+import logoImg from '../logo.jpg'
 
 function Header({ onNewOrder, onViewChange, currentView }) {
     return (
         <header className="header">
             <div className="header-inner">
                 <div className="logo-container">
-                    <img src="/OIP.jpg" alt="Waiter Logo" className="logo-image" />
+                    <img 
+                        src={logoImg} 
+                        alt="Restaurant Logo" 
+                        className="logo-image"
+                        onError={(e) => {
+                            e.target.style.display = 'none';
+                        }} 
+                    />
                     <h1 className="logo-text">Restaurant Management</h1>
                 </div>
 
